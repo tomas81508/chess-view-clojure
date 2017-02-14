@@ -1,10 +1,16 @@
 /* some style */
 
+.board {
+    padding: 1rem;
+    background: #bbb;
+}
+
 .row {
     display: flex;
 }
 
 .cell {
+    background: white;
     position: relative;
     width: 12.5%;
     padding-bottom: 12.5%;
@@ -24,4 +30,8 @@
     height: 100%;
     top: 0;
     left: 0;
+}
+
+.piece {
+    width: 70%;
 }

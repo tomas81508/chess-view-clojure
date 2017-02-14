@@ -1,27 +1,13 @@
 (ns chess-view-clojure.main
   (:require [reagent.core :as reagent :refer [atom]]
-            [chess-view-clojure.state :refer [create-state
-                                              get-board-rows]]))
+            [chess-view-clojure.state :refer [create-state]]
+            [chess-view-clojure.app-component :as app-component]))
 
 (enable-console-print!)
-
-(println "korv")
 
 ;; define your app data so that it doesn't get over-written on reload
 
 (defonce app-state-atom (atom (create-state)))
-
-(defn hello-world []
-  (let [state @app-state-atom]
-    [:div {:className "board"}
-     (map (fn [row]
-            [:div {:className "row"}
-             (map (fn [cell]
-                    [:div {:className "cell"}
-                     [:div {:className "cell__content"}
-                      (str (:row cell) (:column cell))]])
-                  row)])
-          (get-board-rows state))]))
 
 (defn ajax [{route      :route
              data       :data
@@ -46,12 +32,11 @@
        :data       nil
        :on-success (fn [{data :data}]
                      (swap! app-state-atom (fn [state]
-                                             (assoc state :game-state data)))
-                     (println data))
+                                             (assoc state :game-state data))))
        :on-error   (fn [_]
                      (println "error"))})
 
-(reagent/render-component [hello-world]
+(reagent/render-component [app-component/app-component {:app-state-atom app-state-atom}]
                           (. js/document (getElementById "app")))
 
 (defn on-js-reload []
