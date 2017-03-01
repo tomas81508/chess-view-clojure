@@ -9,11 +9,17 @@
     display: flex;
 }
 
+/* rebeccapurple */
+
 .cell {
     background: white;
     position: relative;
     width: 12.5%;
     padding-bottom: 12.5%;
+}
+
+.cell--selectable {
+    cursor: pointer;
 }
 
 .row:nth-child(odd) .cell:nth-child(even),
