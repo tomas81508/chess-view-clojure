@@ -3,6 +3,7 @@
 .board {
     padding: 1rem;
     background: #bbb;
+    user-select: none;
 }
 
 .row {
@@ -20,6 +21,15 @@
 
 .cell--selectable {
     cursor: pointer;
+}
+
+.cell--selected::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    border: 4px solid rebeccapurple;
 }
 
 .row:nth-child(odd) .cell:nth-child(even),

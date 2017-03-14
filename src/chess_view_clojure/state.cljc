@@ -141,6 +141,23 @@
                                               :piece  {:type "rook", :owner "large", :valid-moves []}}],
                               :players      [{:id "large"} {:id "small"}]}}))
 
+(defn create-coordinates
+  {:test (fn []
+           (is= (create-coordinates 3 5)
+                {:row 3 :column 5})
+           (is= (create-coordinates "a8")
+                {:row 0 :column 0})
+           (is= (create-coordinates "c2")
+                {:row 6 :column 2})
+           (is= (create-coordinates "h1")
+                {:row 7 :column 7}))}
+  ([chess-coordinates]
+   (let []
+     (create-coordinates (- 8 (read-string (str (second chess-coordinates))))
+                         (- (int (first chess-coordinates)) 97))))
+  ([row column]
+   {:row row :column column}))
+
 (defn
   ^{:test (fn []
             (is= (take 2 (first (get-board-rows (create-initial-state))))
@@ -152,11 +169,11 @@
 
 (defn
   ^{:test (fn []
-            (is= (get-cell (create-initial-state) 0 0)
+            (is= (get-cell (create-initial-state) (create-coordinates 0 0))
                  {:row 0, :column 0, :piece {:type "rook", :owner "small", :valid-moves []}})
-            (is= (get-cell (create-initial-state) 1 3)
+            (is= (get-cell (create-initial-state) (create-coordinates 1 3))
                  {:row 1, :column 3, :piece {:type "pawn", :owner "small", :valid-moves []}}))}
-  get-cell [state row column]
+  get-cell [state {row :row column :column}]
   (get-in state [:game-state :board (+ (* row 8) column)]))
 
 (defn
@@ -165,11 +182,11 @@
                  {:type "rook", :owner "small"})
             (is= (get-piece {:piece nil})
                  nil)
-            (is= (get-piece (create-initial-state) 0 0)
+            (is= (get-piece (create-initial-state) (create-coordinates 0 0))
                  {:type "rook", :owner "small" :valid-moves []}))}
   get-piece
-  ([state row column]
-   (get-piece (get-cell state row column)))
+  ([state coordinates]
+   (get-piece (get-cell state coordinates)))
   ([cell]
    (:piece cell)))
 
@@ -190,12 +207,24 @@
 (defn
   ^{:test (fn []
             (is= (-> (create-initial-state)
-                     (get-piece 0 0)
+                     (get-piece (create-coordinates 0 0))
                      (get-valid-moves))
                  []))}
   get-valid-moves [piece]
   (:valid-moves piece))
 
 (defn
+  ^{:test (fn []
+            ;; This is tested by get-selected-piece-coordinates.
+            )}
+  set-selected-piece-coordinates [state coordinates]
+  (assoc-in state [:view-state :selected-piece-coordinates] coordinates))
+
+(defn
+  ^{:test (fn []
+            (is= (-> (create-initial-state)
+                     (set-selected-piece-coordinates :value)
+                     (get-selected-piece-coordinates))
+                 :value))}
   get-selected-piece-coordinates [state]
-  )
+  (get-in state [:view-state :selected-piece-coordinates]))

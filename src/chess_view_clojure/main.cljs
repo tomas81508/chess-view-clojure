@@ -2,7 +2,8 @@
   (:require [reagent.core :as reagent :refer [atom]]
             [chess-view-clojure.state :refer [create-state]]
             [chess-view-clojure.app-component :as app-component]
-            [chess-view-clojure.ajax :refer [ajax]]))
+            [chess-view-clojure.ajax :refer [ajax]]
+            [chess-view-clojure.core :as core]))
 
 (enable-console-print!)
 
@@ -18,8 +19,15 @@
        :on-error   (fn [_]
                      (println "error"))})
 
+(defn handle-event!
+  [{event :event data :data}]
+  (condp = event
+    :cell-click
+    (swap! app-state-atom core/handle-cell-click data)))
+
 (reagent/render-component [app-component/app-component {:app-state-atom app-state-atom
-                                                        :trigger-event  (fn [{event :event data :data}]
-                                                                          (println event data))}]
+                                                        :trigger-event  (fn [{event :event data :data :as params}]
+                                                                          (println event data)
+                                                                          (handle-event! params))}]
                           (. js/document (getElementById "app")))
 
