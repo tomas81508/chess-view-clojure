@@ -1,6 +1,6 @@
 (ns chess-view-clojure.core
   (:require [chess-view-clojure.state :as s]
-            [test.core :refer [is= is is-not]]))
+            [ysera.test #?(:clj :refer :cljs :refer-macros) [is= is is-not]]))
 
 (defn
   ^{:test (fn []
@@ -80,6 +80,17 @@
   (= (s/get-selected-piece-coordinates state)
      coordinates))
 
+(defn valid-piece-move?
+  {:test (fn []
+           (is (-> (s/create-initial-state)
+                   (s/get-piece (s/create-coordinates 6 0))
+                   (valid-piece-move? (s/create-coordinates 5 0))))
+           (is-not (-> (s/create-initial-state)
+                       (s/get-piece (s/create-coordinates 6 0))
+                       (valid-piece-move? (s/create-coordinates 5 1)))))}
+  [piece target-coordinates]
+  (contains? (s/get-valid-moves piece) [(:row target-coordinates) (:column target-coordinates)]))
+
 (defn
   ^{:test (fn []
             ;; When clicking on a movable piece, select it.
@@ -103,11 +114,24 @@
             (is= (-> (s/create-initial-state)
                      (s/set-selected-piece-coordinates (s/create-coordinates 6 0))
                      (handle-cell-click (s/create-coordinates 6 0)))
-                 (s/create-initial-state)))}
+                 (s/create-initial-state))
+
+            ;; When having a piece selected, and clicking on a valid target cell.
+            (let [state (-> (s/create-initial-state)
+                            (s/set-selected-piece-coordinates (s/create-coordinates 6 0))
+                            (handle-cell-click (s/create-coordinates 5 0)))]
+              (is= (s/get-selected-target-coordinates state)
+                   (s/create-coordinates 5 0)))
+            )}
   handle-cell-click [state coordinates]
   (let [piece (s/get-piece state coordinates)
         coordinates-selected (s/get-selected-piece-coordinates state)]
     (cond
+      (and coordinates-selected
+           (valid-piece-move? (s/get-piece state coordinates-selected) coordinates))
+      (s/set-selected-target-coordinates state coordinates)
+
+
       (and coordinates-selected (or (not piece)
                                     (= piece (s/get-piece state coordinates-selected))))
       (s/set-selected-piece-coordinates state nil)
@@ -117,3 +141,43 @@
 
       :else
       state)))
+
+(defn set-waiting-for-create-game-service
+  ;; This one is tested in the waiting-for-create-game-service? function tests.
+  [state]
+  (s/set-waiting-for-service state true))
+
+(defn waiting-for-create-game-service?
+  {:test (fn []
+           (is (-> (s/create-state)
+                   (set-waiting-for-create-game-service)
+                   (waiting-for-create-game-service?)))
+           (is-not (-> (s/create-state)
+                       (waiting-for-create-game-service?))))}
+  [state]
+  (s/waiting-for-service? state))
+
+(defn receive-create-game-response
+  {:test (fn []
+           (let [state (receive-create-game-response (s/create-state) {:status 200 :data "game-state"})]
+             (is= (s/get-game-state state) "game-state")
+             (is-not (waiting-for-create-game-service? state))))}
+  [state response]
+  (-> state
+      (s/set-waiting-for-service false)
+      (s/set-game-state (:data response))))
+
+(defn should-call-create-game?
+  {:test (fn []
+           (is (should-call-create-game? (s/create-state)))
+           (is-not (should-call-create-game? (set-waiting-for-create-game-service (s/create-state))))
+           (is-not (should-call-create-game? (s/create-initial-state))))}
+  [state]
+  (and (not (s/get-game-state state))
+       (not (waiting-for-create-game-service? state))))
+
+(defn should-call-move-piece?
+  {:test (fn []
+           (is (should-call-move-piece? (s/create-initial-state))))}
+  [state]
+  )

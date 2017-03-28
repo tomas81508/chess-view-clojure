@@ -1,12 +1,15 @@
 (ns chess-view-clojure.state
-  (:require [test.core :refer [is=]]))
+  (:require [ysera.test #?(:clj :refer :cljs :refer-macros) [is= is is-not]]
+            #?(:cljs [cljs.reader :refer [read-string]])))
 
 (defn
   create-state
   ([] (create-state {}))
-  ([{game-state :game-state}]
+  ([{game-state :game-state
+     outside-world :outside-world}]
    {:game-state game-state
-    :view-state {:selected-piece-coordinates nil}}))
+    :view-state {:selected-piece-coordinates nil}
+    :outside-world (or outside-world {:service nil})}))
 
 (defn create-initial-state []
   (create-state {:view-state {:selected-piece-coordinates nil}
@@ -209,9 +212,13 @@
             (is= (-> (create-initial-state)
                      (get-piece (create-coordinates 0 0))
                      (get-valid-moves))
-                 []))}
+                 #{})
+            (is= (-> (create-initial-state)
+                     (get-piece (create-coordinates 6 0))
+                     (get-valid-moves))
+                 #{[5 0] [4 0]}))}
   get-valid-moves [piece]
-  (:valid-moves piece))
+  (set (:valid-moves piece)))
 
 (defn
   ^{:test (fn []
@@ -228,3 +235,46 @@
                  :value))}
   get-selected-piece-coordinates [state]
   (get-in state [:view-state :selected-piece-coordinates]))
+
+(defn
+  ^{:test (fn []
+            ;; This is tested by get-selected-target-coordinates.
+            )}
+  set-selected-target-coordinates [state coordinates]
+  (assoc-in state [:view-state :selected-target-coordinates] coordinates))
+
+(defn
+  ^{:test (fn []
+            (is= (-> (create-initial-state)
+                     (set-selected-target-coordinates :value)
+                     (get-selected-target-coordinates))
+                 :value))}
+  get-selected-target-coordinates [state]
+  (get-in state [:view-state :selected-target-coordinates]))
+
+
+(defn waiting-for-service?
+  {:test (fn []
+           (is (waiting-for-service? (create-state {:outside-world {:service {:loading true}}})))
+           (is-not (waiting-for-service? (create-state {:outside-world {:service {:loading false}}})))
+           (is-not (waiting-for-service? (create-state {:outside-world {:service nil}}))))}
+  [state]
+  (get-in state [:outside-world :service :loading]))
+
+(defn set-waiting-for-service
+  {:test (fn []
+           (is (waiting-for-service? (set-waiting-for-service (create-state) true))))}
+  [state value]
+  (assoc-in state [:outside-world :service :loading] value))
+
+(defn set-game-state
+  ;; Tested by get-game-state function.
+  [state game-state]
+  (assoc state :game-state game-state))
+
+(defn get-game-state
+  {:test (fn []
+           (is= (get-game-state (set-game-state (create-state) "game-state"))
+                "game-state"))}
+  [state]
+  (:game-state state))

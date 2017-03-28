@@ -2,22 +2,29 @@
   (:require [reagent.core :as reagent :refer [atom]]
             [chess-view-clojure.state :refer [create-state]]
             [chess-view-clojure.app-component :as app-component]
-            [chess-view-clojure.ajax :refer [ajax]]
-            [chess-view-clojure.core :as core]))
+            [chess-view-clojure.core :as core]
+            [chess-view-clojure.service :as service]))
 
 (enable-console-print!)
 
 ;; define your app data so that it doesn't get over-written on reload
 
-(defonce app-state-atom (atom (create-state)))
+(defonce app-state-atom (atom nil))
 
-(ajax {:route      "/createGame"
-       :data       nil
-       :on-success (fn [{data :data}]
-                     (swap! app-state-atom (fn [state]
-                                             (assoc state :game-state data))))
-       :on-error   (fn [_]
-                     (println "error"))})
+(add-watch app-state-atom :game-engine
+           (fn [_ _ state _]
+             (cond
+               (core/should-call-create-game? state)
+               (service/create-game! app-state-atom)
+
+              (core/should-call-move-piece? state)
+              (service/move-piece! app-state-atom)
+
+               )))
+
+(swap! app-state-atom
+       (fn [state]
+         (or state (create-state))))
 
 (defn handle-event!
   [{event :event data :data}]
@@ -30,4 +37,3 @@
                                                                           (println event data)
                                                                           (handle-event! params))}]
                           (. js/document (getElementById "app")))
-

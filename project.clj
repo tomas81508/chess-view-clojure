@@ -10,7 +10,8 @@
                  [org.clojure/clojurescript "1.9.229"]
                  [org.clojure/core.async "0.2.395"
                   :exclusions [org.clojure/tools.reader]]
-                 [reagent "0.6.0"]]
+                 [reagent "0.6.0"]
+                 [ysera "1.0.2"]]
 
   :plugins [[lein-figwheel "0.5.9"]
             [lein-cljsbuild "1.1.5" :exclusions [[org.clojure/clojure]]]]
@@ -85,7 +86,7 @@
 
              ;; to configure a different figwheel logfile path
              ;; :server-logfile "tmp/logs/figwheel-logfile.log"
-             
+
 
 
   ;; setting up nREPL for Figwheel and ClojureScript dev
