@@ -169,6 +169,19 @@
 
 (defn
   ^{:test (fn []
+            (is= (->> (get-cells-with-pieces (create-initial-state))
+                      (take 1))
+                 [{:row 0
+                   :column 0
+                   :piece {:type "rook"
+                           :owner "small"
+                           :valid-moves []}}]))}
+  get-cells-with-pieces [state]
+  (->> (get-in state [:game-state :board])
+       (filter :piece)))
+
+(defn
+  ^{:test (fn []
             (is= (get-cell (create-initial-state) (create-coordinates 0 0))
                  {:row 0, :column 0, :piece {:type "rook", :owner "small", :valid-moves []}})
             (is= (get-cell (create-initial-state) (create-coordinates 1 3))
@@ -228,3 +241,8 @@
                  :value))}
   get-selected-piece-coordinates [state]
   (get-in state [:view-state :selected-piece-coordinates]))
+
+(defn get-coordinates
+  {}
+  [cell]
+  (create-coordinates (:row cell) (:column cell)))

@@ -1,53 +1,53 @@
 /* some style */
 
 .board {
-    padding: 1rem;
-    background: #bbb;
-    user-select: none;
+    /*padding: 1rem;*/
+    /*background: #bbb;*/
+    /*user-select: none;*/
 }
 
 .row {
-    display: flex;
+    /*display: flex;*/
 }
 
 /* rebeccapurple */
 
 .cell {
-    background: white;
-    position: relative;
-    width: 12.5%;
-    padding-bottom: 12.5%;
+    /*background: white;*/
+    /*position: relative;*/
+    /*width: 12.5%;*/
+    /*padding-bottom: 12.5%;*/
 }
 
 .cell--selectable {
-    cursor: pointer;
+    /*cursor: pointer;*/
 }
 
 .cell--selected::after {
-    content: "";
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    box-sizing: border-box;
-    border: 4px solid rebeccapurple;
+    /*content: "";*/
+    /*position: absolute;*/
+    /*width: 100%;*/
+    /*height: 100%;*/
+    /*box-sizing: border-box;*/
+    /*border: 4px solid rebeccapurple;*/
 }
 
 .row:nth-child(odd) .cell:nth-child(even),
 .row:nth-child(even) .cell:nth-child(odd) {
-    background: #ddd;
+    /*background: #ddd;*/
 }
 
 .cell__content {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
+    /*display: flex;*/
+    /*justify-content: center;*/
+    /*align-items: center;*/
+    /*position: absolute;*/
+    /*width: 100%;*/
+    /*height: 100%;*/
+    /*top: 0;*/
+    /*left: 0;*/
 }
 
 .piece {
-    width: 70%;
+    /*width: 70%;*/
 }

@@ -6,9 +6,9 @@
 
   :min-lein-version "2.7.1"
 
-  :dependencies [[org.clojure/clojure "1.8.0"]
-                 [org.clojure/clojurescript "1.9.229"]
-                 [org.clojure/core.async "0.2.395"
+  :dependencies [[org.clojure/clojure "1.9.0-alpha15"]
+                 [org.clojure/clojurescript "1.9.494"]
+                 [org.clojure/core.async "0.3.442"
                   :exclusions [org.clojure/tools.reader]]
                  [reagent "0.6.0"]]
 
@@ -37,7 +37,6 @@
                            :asset-path "js/compiled/out"
                            :output-to "resources/public/js/compiled/chess_view_clojure.js"
                            :output-dir "resources/public/js/compiled/out"
-                           :source-map-timestamp true
                            ;; To console.log CLJS data-structures make sure you enable devtools in Chrome
                            ;; https://github.com/binaryage/cljs-devtools
                            :preloads [devtools.preload]}}
