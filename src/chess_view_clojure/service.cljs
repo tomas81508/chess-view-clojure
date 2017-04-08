@@ -11,3 +11,5 @@
                        (swap! state-atom core/receive-create-game-response response))
          :on-error   (fn [_]
                        (println "error"))}))
+
+(defn move-piece! [state-atom])
