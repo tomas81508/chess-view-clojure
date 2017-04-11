@@ -176,8 +176,51 @@
   (and (not (s/get-game-state state))
        (not (waiting-for-create-game-service? state))))
 
+(defn set-waiting-for-move-piece-service
+  ;; This one is tested in the waiting-for-move-piece-service? function tests.
+  [state]
+  (s/set-waiting-for-service state true))
+
+(defn waiting-for-move-piece-service?
+  {:test (fn []
+           (is (-> (s/create-state)
+                   (set-waiting-for-move-piece-service)
+                   (waiting-for-move-piece-service?)))
+           (is-not (-> (s/create-state)
+                       (waiting-for-move-piece-service?))))}
+  [state]
+  (s/waiting-for-service? state))
+
 (defn should-call-move-piece?
   {:test (fn []
-           (is (should-call-move-piece? (s/create-initial-state))))}
+           (is (should-call-move-piece? (-> (s/create-initial-state)
+                                            (s/set-selected-piece-coordinates {:row 6 :column 0})
+                                            (s/set-selected-target-coordinates {:row 5 :column 0}))))
+           (is-not (should-call-move-piece? (-> (s/create-initial-state)
+                                                (s/set-selected-piece-coordinates {:row 6 :column 0})
+                                                (s/set-selected-target-coordinates {:row 5 :column 0})
+                                                (set-waiting-for-move-piece-service))))
+           (is-not (should-call-move-piece? (-> (s/create-initial-state)
+                                                (s/set-selected-piece-coordinates {:row 6 :column 0}))))
+           (is-not (should-call-move-piece? (s/create-initial-state))))}
   [state]
-  )
+  (and (s/get-selected-piece-coordinates state)
+       (s/get-selected-target-coordinates state)
+       (not (waiting-for-move-piece-service? state))))
+
+(defn receive-move-piece-response
+  {:test (fn []
+           (let [state (receive-move-piece-response (-> (s/create-state)
+                                                        (s/set-selected-piece-coordinates {:row 6 :column 0})
+                                                        (s/set-selected-target-coordinates {:row 5 :column 0}))
+                                                    {:status 200 :data "game-state"})]
+             (is= (s/get-game-state state) "game-state")
+             (is= (s/get-selected-piece-coordinates state) nil)
+             (is= (s/get-selected-target-coordinates state) nil)
+             (is-not (waiting-for-move-piece-service? state))))}
+  [state response]
+  (-> state
+      (s/set-waiting-for-service false)
+      (s/set-game-state (:data response))
+      (s/set-selected-piece-coordinates nil)
+      (s/set-selected-target-coordinates nil)))

@@ -12,13 +12,13 @@
 (defonce app-state-atom (atom nil))
 
 (add-watch app-state-atom :game-engine
-           (fn [_ _ state _]
+           (fn [_ _ _ state]
              (cond
                (core/should-call-create-game? state)
                (service/create-game! app-state-atom)
 
-              (core/should-call-move-piece? state)
-              (service/move-piece! app-state-atom)
+               (core/should-call-move-piece? state)
+               (service/move-piece! app-state-atom)
 
                )))
 
