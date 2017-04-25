@@ -224,3 +224,16 @@
       (s/set-game-state (:data response))
       (s/set-selected-piece-coordinates nil)
       (s/set-selected-target-coordinates nil)))
+
+(defn get-cells-with-pieces
+  {:test (fn []
+           (is= (->> (get-cells-with-pieces (s/create-initial-state))
+                     (first))
+                {:row 0
+                 :column 0
+                 :piece {:type "rook"
+                         :owner "small"
+                         :valid-moves []}}))}
+  [state]
+  (->> (s/get-board state)
+       (filter :piece)))

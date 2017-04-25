@@ -161,13 +161,16 @@
   ([row column]
    {:row row :column column}))
 
+(defn get-board [state]
+  (get-in state [:game-state :board]))
+
 (defn
   ^{:test (fn []
             (is= (take 2 (first (get-board-rows (create-initial-state))))
                  [{:row 0, :column 0, :piece {:type "rook", :owner "small", :valid-moves []}}
                   {:row 0, :column 1, :piece {:type "knight", :owner "small", :valid-moves []}}]))}
   get-board-rows [state]
-  (->> (:board (:game-state state))
+  (->> (get-board state)
        (partition 8)))
 
 (defn
