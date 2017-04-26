@@ -5,16 +5,17 @@
 (defn piece-component [{state       :state
                         coordinates :coordinates
                         piece       :piece}]
-      (let [factor 125
+      (let [factor 12.5
             x (* factor (:column coordinates))
             y (* factor (:row coordinates))]
+           (when (= (:id piece) "9")
+                 (println "top" (str (+ 1.25 y) "%")))
            [:img {:style {:pointerEvents "none"
-                          :top           "1.25%"
-                          :left          "1.25%"
+                          :top           (str (+ 1.25 y) "%")
+                          :left          (str (+ 1.25 x) "%")
                           :width         "10%"
                           :position      "absolute"
-                          :transition    "all 1500ms ease"
-                          :transform     (str "translate(" x "%, " y "%)")}
+                          :transition    "all 1500ms ease"}
                   :src   (core/get-piece-image-url state piece)}]))
 
 (defn cell-style [{coordinates :coordinates}]
