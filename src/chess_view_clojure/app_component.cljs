@@ -42,6 +42,7 @@
 (defn app-component [{app-state-atom :app-state-atom
                       trigger-event  :trigger-event}]
       (let [state @app-state-atom]
+           (println (map (comp :id :piece) (core/get-cells-with-pieces state)))
            [:div {:style {:padding    "2%"
                           :background "#bbb"
                           :userSelect "none"}}

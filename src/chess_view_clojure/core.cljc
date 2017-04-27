@@ -236,4 +236,5 @@
                          :valid-moves []}}))}
   [state]
   (->> (s/get-board state)
-       (filter :piece)))
+       (filter :piece)
+       (sort-by (comp :id :piece))))
