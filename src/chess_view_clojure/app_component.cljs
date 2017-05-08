@@ -15,7 +15,7 @@
                           :left          (str (+ 1.25 x) "%")
                           :width         "10%"
                           :position      "absolute"
-                          :transition    "all 1500ms ease"}
+                          :transition    "all 300ms ease"}
                   :src   (core/get-piece-image-url state piece)}]))
 
 (defn cell-style [{coordinates :coordinates}]
