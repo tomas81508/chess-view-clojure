@@ -62,4 +62,4 @@
                                         :key         (str "p-" (get-in cell [:piece :id]))
                                         :coordinates cell
                                         :piece       (:piece cell)}])
-                  (core/get-cells-with-pieces state))]]))
+                  (sort-by (comp :id :piece) (core/get-cells-with-pieces state)))]]))
