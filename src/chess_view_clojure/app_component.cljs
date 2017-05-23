@@ -13,7 +13,7 @@
                           :left          (str (+ x 1.25) "%")
                           :width         "10%"
                           :position      "absolute"
-                          :transition    "all 1500ms ease"}
+                          :transition    "all 200ms ease"}
                   :src   (core/get-piece-image-url state piece)}]))
 
 (defn cell-style [{coordinates :coordinates}]
@@ -40,7 +40,8 @@
 (defn app-component [{app-state-atom :app-state-atom
                       trigger-event  :trigger-event}]
       (let [state @app-state-atom]
-           [:div {:style {:padding    "2%"
+           [:div
+            [:div {:style {:padding    "2%"
                           :background "#bbb"
                           :userSelect "none"}}
             [:div {:style {:position "relative"}}
@@ -62,4 +63,24 @@
                                         :key         (str "p-" (get-in cell [:piece :id]))
                                         :coordinates cell
                                         :piece       (:piece cell)}])
-                  (sort-by (comp :id :piece) (core/get-cells-with-pieces state)))]]))
+                  (sort-by (comp :id :piece) (core/get-cells-with-pieces state)))]]
+            [:button {:style {:width "200px"
+                              :height "80px"
+                              :margin-top "10px"}
+                      :on-click (fn [] (trigger-event {:event :undo}))}
+             "Undo"]]))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
