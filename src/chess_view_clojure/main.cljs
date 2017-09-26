@@ -23,6 +23,8 @@
                  (core/should-call-undo? state)
                  (service/undo! app-state-atom)
 
+                 (core/should-call-redo? state)
+                 (service/redo! app-state-atom)
                  )))
 
 (swap! app-state-atom
@@ -34,6 +36,9 @@
       (condp = event
              :cell-click
              (swap! app-state-atom core/handle-cell-click data)
+
+             :redo
+             (swap! app-state-atom core/handle-redo-click)
 
              :undo
              (swap! app-state-atom core/handle-undo-click)))

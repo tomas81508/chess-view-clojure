@@ -192,6 +192,7 @@
                  {:type "rook", :owner "small" :valid-moves []}))}
   get-piece
   ([state coordinates]
+  {:pre [(not (nil? coordinates))]}
    (get-piece (get-cell state coordinates)))
   ([cell]
    (:piece cell)))

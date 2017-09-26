@@ -29,6 +29,18 @@
                   :on-error   (fn [_]
                                   (println "error"))})))
 
+(defn redo!
+  [state-atom]
+  (swap! state-atom core/set-waiting-for-service)
+  (let [state (deref state-atom)
+        player-id (s/get-player-in-turn state)]
+    (ajax {:route      "/redo"
+           :data       {:player-id player-id}
+           :on-success (fn [response]
+                         (swap! state-atom core/receive-move-piece-service-response response))
+           :on-error   (fn [_]
+                         (println "error"))})))
+
 (defn undo!
       [state-atom]
       (swap! state-atom core/set-waiting-for-service)

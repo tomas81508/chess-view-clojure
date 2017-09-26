@@ -80,6 +80,21 @@
   (= (s/get-selected-piece-coordinates state)
      coordinates))
 
+(defn get-selected-piece
+  {:test (fn []
+           (is= (-> (s/create-initial-state)
+                    (s/set-selected-piece-coordinates (s/create-coordinates 0 0))
+                    (get-selected-piece))
+                {:type "rook"
+                 :owner "small"
+                 :valid-moves []})
+           (is= (-> (s/create-initial-state)
+                    (get-selected-piece))
+                nil))}
+  [state]
+  (when-let [selected-piece-coordinates (s/get-selected-piece-coordinates state)]
+    (s/get-piece state selected-piece-coordinates)))
+
 (defn valid-piece-move?
   {:test (fn []
            (is (-> (s/create-initial-state)
@@ -145,6 +160,10 @@
 
 (defn handle-undo-click [state]
   (assoc-in state [:view-state :undo-selected] true))
+
+
+(defn handle-redo-click [state]
+  (assoc-in state [:view-state :redo-selected] true))
 
 (defn set-waiting-for-create-game-service
   ;; This one is tested in the waiting-for-create-game-service? function tests.
@@ -217,6 +236,12 @@
   (and (get-in state [:view-state :undo-selected])
        (not (waiting-for-service? state))))
 
+(defn should-call-redo?
+  [state]
+  (and (get-in state [:view-state :redo-selected])
+       (not (waiting-for-service? state))))
+
+
 (defn receive-undo-service-response
   [state response]
   (-> state
@@ -225,6 +250,16 @@
       (s/set-selected-piece-coordinates nil)
       (s/set-selected-target-coordinates nil)
       (assoc-in [:view-state :undo-selected] false)))
+
+(defn receive-redo-service-response
+  [state response]
+  (-> state
+      (s/set-waiting-for-service false)
+      (s/set-game-state (:data response))
+      (s/set-selected-piece-coordinates nil)
+      (s/set-selected-target-coordinates nil)
+      (assoc-in [:view-state :redo-selected] false)))
+
 
 (defn receive-move-piece-service-response
   {:test (fn []
@@ -242,7 +277,8 @@
       (s/set-game-state (:data response))
       (s/set-selected-piece-coordinates nil)
       (s/set-selected-target-coordinates nil)
-      (assoc-in [:view-state :undo-selected] false)))
+      (assoc-in [:view-state :undo-selected] false)
+      (assoc-in [:view-state :redo-selected] false)))
 
 (defn get-cells-with-pieces
   {:test (fn []

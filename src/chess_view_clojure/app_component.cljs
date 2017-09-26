@@ -25,22 +25,24 @@
 (defn cell-component [{state :state coordinates :coordinates trigger-event :trigger-event}]
   (let [piece (s/get-piece state coordinates)
         selected (core/selected? state coordinates)
-        selected-piece (->> (s/get-selected-piece-coordinates state)
-                            (s/get-piece state))
-        valid-moves (set (if selected-piece
-                           (:valid-moves selected-piece)
-                           []))]
+        selected-piece (core/get-selected-piece state)]
     [:div {:style   (merge (cell-style {:coordinates coordinates})
                            (when (core/can-move? piece)
                              {:cursor "pointer"})
-                           (if selected
-                             {:padding-bottom "calc(12.5% - 8px)"
-                              :boxSizing      "border-box"
-                              :border         "4px solid rebeccapurple"}
-                             {:padding-bottom "12.5%"})
-                           (when (contains? valid-moves [(:row coordinates)
-                                                         (:column coordinates)])
-                             {:border "4px solid green"}))
+                           (cond selected
+                                 {:padding-bottom "calc(12.5% - 8px)"
+                                  :boxSizing      "border-box"
+                                  :border         "4px solid rebeccapurple"}
+
+                                 (and selected-piece
+                                      (contains? (set (:valid-moves selected-piece))
+                                                 [(:row coordinates) (:column coordinates)]))
+                                 {:padding-bottom "calc(12.5% - 8px)"
+                                  :boxSizing      "border-box"
+                                  :border         "4px solid green"}
+
+                                 :else
+                                 {:padding-bottom "12.5%"}))
            :onClick (fn [] (trigger-event {:event :cell-click
                                            :data  coordinates}))}]))
 
@@ -77,6 +79,11 @@
                           :margin-top "10px"}
                :on-click (fn [] (trigger-event {:event :undo}))}
       "Undo"]
+     [:button {:style    {:width      "200px"
+                          :height     "80px"
+                          :margin-top "10px"}
+               :on-click (fn [] (trigger-event {:event :redo}))}
+      "Redo"]
      [:h2 (s/get-player-in-turn state)]]))
 
 
