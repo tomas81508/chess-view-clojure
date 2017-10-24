@@ -1,14 +1,14 @@
 (ns chess-view-clojure.state
   (:require [ysera.test #?(:clj :refer :cljs :refer-macros) [is= is is-not]]
-            #?(:cljs [cljs.reader :refer [read-string]])))
+    #?(:cljs [cljs.reader :refer [read-string]])))
 
 (defn
   create-state
   ([] (create-state {}))
-  ([{game-state :game-state
+  ([{game-state    :game-state
      outside-world :outside-world}]
-   {:game-state game-state
-    :view-state {:selected-piece-coordinates nil}
+   {:game-state    game-state
+    :view-state    {:selected-piece-coordinates nil}
     :outside-world (or outside-world {:service nil})}))
 
 (defn create-initial-state []
@@ -192,7 +192,7 @@
                  {:type "rook", :owner "small" :valid-moves []}))}
   get-piece
   ([state coordinates]
-  {:pre [(not (nil? coordinates))]}
+   {:pre [(not (nil? coordinates))]}
    (get-piece (get-cell state coordinates)))
   ([cell]
    (:piece cell)))
@@ -282,3 +282,26 @@
                 "game-state"))}
   [state]
   (:game-state state))
+
+(defn get-previous-moves
+  {:test (fn []
+           (is= (-> (create-state {:game-state {:previous-moves []}})
+                    (get-previous-moves))
+                []))}
+  [state]
+  (:previous-moves (get-game-state state)))
+
+(defn get-previous-move
+  {:test (fn []
+           (is= (-> (create-state {:game-state {:previous-moves [:a :b :c]}})
+                    (get-previous-move))
+                :c)
+           (is= (-> (create-state {:game-state {:previous-moves []}})
+                    (get-previous-move))
+                nil))}
+  [state]
+  (last (get-previous-moves state)))
+
+(defn bad-coordinates->good-coordinates
+  [bad-coordinates]
+  (create-coordinates (first bad-coordinates) (last bad-coordinates)))

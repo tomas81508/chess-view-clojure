@@ -85,8 +85,8 @@
            (is= (-> (s/create-initial-state)
                     (s/set-selected-piece-coordinates (s/create-coordinates 0 0))
                     (get-selected-piece))
-                {:type "rook"
-                 :owner "small"
+                {:type        "rook"
+                 :owner       "small"
                  :valid-moves []})
            (is= (-> (s/create-initial-state)
                     (get-selected-piece))
@@ -292,3 +292,15 @@
   [state]
   (->> (s/get-board state)
        (filter :piece)))
+
+(defn previous-move->piece
+  {:test (fn []
+           (is= (previous-move->piece {:piece-type             "rook"
+                                       :owner            "large"
+                                       :from-coordinates [6 0]
+                                       :to-coordinates   [6 3]})
+                {:type  "rook"
+                 :owner "large"}))}
+  [previous-move]
+  {:type  (:piece-type previous-move)
+   :owner (:owner previous-move)})

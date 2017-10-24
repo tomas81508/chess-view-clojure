@@ -25,7 +25,9 @@
 (defn cell-component [{state :state coordinates :coordinates trigger-event :trigger-event}]
   (let [piece (s/get-piece state coordinates)
         selected (core/selected? state coordinates)
-        selected-piece (core/get-selected-piece state)]
+        selected-piece (core/get-selected-piece state)
+        previous-move (s/get-previous-move state)]
+    (println coordinates)
     [:div {:style   (merge (cell-style {:coordinates coordinates})
                            (when (core/can-move? piece)
                              {:cursor "pointer"})
@@ -44,7 +46,20 @@
                                  :else
                                  {:padding-bottom "12.5%"}))
            :onClick (fn [] (trigger-event {:event :cell-click
-                                           :data  coordinates}))}]))
+                                           :data  coordinates}))}
+     (when (and previous-move (= coordinates (s/bad-coordinates->good-coordinates (:from-coordinates previous-move))))
+       [:div {:style {:position      "absolute"
+                      :height        "40%"
+                      :width         "40%"
+                      :left          "30%"
+                      :top           "30%"
+                      :border-radius "50%"
+                      :background    "rgba(255, 152, 0, 0.8)"}}])
+     (when (and previous-move (= coordinates (s/bad-coordinates->good-coordinates (:to-coordinates previous-move))))
+       [:div {:style {:position   "absolute"
+                      :height     "100%"
+                      :width      "100%"
+                      :background "rgba(255, 152, 0, 0.5)"}}])]))
 
 
 (defn app-component [{app-state-atom :app-state-atom
@@ -84,7 +99,17 @@
                           :margin-top "10px"}
                :on-click (fn [] (trigger-event {:event :redo}))}
       "Redo"]
-     [:h2 (s/get-player-in-turn state)]]))
+     [:h2 (s/get-player-in-turn state)]
+     [:ol
+      (->> (s/get-previous-moves state)
+           (map-indexed (fn [index previous-move]
+                          [:li {:key   index}
+                           [:div
+                            [:img {:style {:position "relative"
+                                           :top "2px"
+                                           :pointerEvents "none"
+                                           :width         "25px"}
+                                   :src   (core/get-piece-image-url state (core/previous-move->piece previous-move))}]]])))]]))
 
 
 
