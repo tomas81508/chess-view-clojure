@@ -21,8 +21,8 @@
             from-coordinates (s/get-selected-piece-coordinates state)
             to-coordinates (s/get-selected-target-coordinates state)]
            (ajax {:route      "/move"
-                  :data       {:from-position [(:row from-coordinates) (:column from-coordinates)]
-                               :to-position   [(:row to-coordinates) (:column to-coordinates)]
+                  :data       {:from-position from-coordinates
+                               :to-position   to-coordinates
                                :player-id     player-id}
                   :on-success (fn [response]
                                   (swap! state-atom core/receive-move-piece-service-response response))

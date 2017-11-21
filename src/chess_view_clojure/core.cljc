@@ -2,12 +2,11 @@
   (:require [chess-view-clojure.state :as s]
             [ysera.test #?(:clj :refer :cljs :refer-macros) [is= is is-not]]))
 
-(defn
-  ^{:test (fn []
-            (is= (let [state (s/create-initial-state)]
-                   (starting-player? state (s/get-player-in-turn state)))
-                 true))}
-  starting-player?
+(defn starting-player?
+  {:test (fn []
+           (is= (let [state (s/create-initial-state)]
+                  (starting-player? state (s/get-player-in-turn state)))
+                true))}
   [state player-id]
   (= (:id (first (s/get-players state))) player-id))
 
@@ -17,7 +16,7 @@
                   (player-id->color state (s/get-player-in-turn state)))
                 "white")
            (is= (let [state (s/create-initial-state)]
-                  (player-id->color state (:owner (s/get-piece state (s/create-coordinates 0 0)))))
+                  (player-id->color state (:owner (s/get-piece state [0 7]))))
                 "black"))}
   [state player-id]
   (if (starting-player? state player-id)
@@ -27,10 +26,10 @@
 (defn get-piece-image-url
   {:test (fn []
            (is= (let [state (s/create-initial-state)]
-                  (get-piece-image-url state (s/get-piece state (s/create-coordinates 0 0))))
+                  (get-piece-image-url state (s/get-piece state [0 7])))
                 "asset/piece/rook-black.svg")
            (is= (let [state (s/create-initial-state)]
-                  (get-piece-image-url state (s/get-piece state (s/create-coordinates 6 3))))
+                  (get-piece-image-url state (s/get-piece state [3 1])))
                 "asset/piece/pawn-white.svg"))}
   [state piece]
   (str "asset/piece/"
@@ -39,36 +38,16 @@
        (player-id->color state (:owner piece))
        ".svg"))
 
-(defn
-  ^{:test (fn []
-            (is (-> (s/create-initial-state)
-                    (s/get-piece (s/create-coordinates 6 0))
-                    (can-move?)))
-            (is-not (-> (s/create-initial-state)
-                        (s/get-piece (s/create-coordinates 0 0))
-                        (can-move?))))}
-  can-move? [piece]
+(defn can-move?
+  {:test (fn []
+           (is (-> (s/create-initial-state)
+                   (s/get-piece [0 1])
+                   (can-move?)))
+           (is-not (-> (s/create-initial-state)
+                       (s/get-piece [0 7])
+                       (can-move?))))}
+  [piece]
   (not (empty? (s/get-valid-moves piece))))
-
-
-;(defn
-;  ^{:test (fn []
-;            (is= (-> (s/create-initial-state)
-;                     (select-piece [6 0])
-;                     (s/get-selected-piece-coordinates))
-;                 [6 0]))}
-;  select-piece [state {row :row column :column}]
-;
-;  )
-
-;(defn
-;  ^{:test (fn []
-;            (is= (-> (s/create-initial-state)
-;                     (select-piece {:row 6 :column 0})
-;                     (get-selected-piece))
-;                 ))}
-;  get-selected-piece [state]
-;  )
 
 (defn selected?
   {:test (fn []
@@ -83,7 +62,7 @@
 (defn get-selected-piece
   {:test (fn []
            (is= (-> (s/create-initial-state)
-                    (s/set-selected-piece-coordinates (s/create-coordinates 0 0))
+                    (s/set-selected-piece-coordinates [0 7])
                     (get-selected-piece))
                 {:type        "rook"
                  :owner       "small"
@@ -98,48 +77,47 @@
 (defn valid-piece-move?
   {:test (fn []
            (is (-> (s/create-initial-state)
-                   (s/get-piece (s/create-coordinates 6 0))
-                   (valid-piece-move? (s/create-coordinates 5 0))))
+                   (s/get-piece [0 1])
+                   (valid-piece-move? [0 2])))
            (is-not (-> (s/create-initial-state)
-                       (s/get-piece (s/create-coordinates 6 0))
-                       (valid-piece-move? (s/create-coordinates 5 1)))))}
+                       (s/get-piece [0 1])
+                       (valid-piece-move? [1 2]))))}
   [piece target-coordinates]
-  (contains? (s/get-valid-moves piece) [(:row target-coordinates) (:column target-coordinates)]))
+  (contains? (s/get-valid-moves piece) target-coordinates))
 
-(defn
-  ^{:test (fn []
-            ;; When clicking on a movable piece, select it.
-            (let [selected-piece-coordinates (-> (s/create-initial-state)
-                                                 (handle-cell-click (s/create-coordinates 6 0))
-                                                 (s/get-selected-piece-coordinates))]
-              (is= selected-piece-coordinates (s/create-coordinates 6 0)))
+(defn handle-cell-click
+  {:test (fn []
+           ;; When clicking on a movable piece, select it.
+           (let [selected-piece-coordinates (-> (s/create-initial-state)
+                                                (handle-cell-click [0 1])
+                                                (s/get-selected-piece-coordinates))]
+             (is= selected-piece-coordinates [0 1]))
 
-            ;; When clicking on a cell that has no piece, nothing should happen.
-            (let [state (s/create-initial-state)]
-              (is= (-> state
-                       (handle-cell-click (s/create-coordinates 3 0)))
-                   state))
+           ;; When clicking on a cell that has no piece, nothing should happen.
+           (let [state (s/create-initial-state)]
+             (is= (-> state
+                      (handle-cell-click [0 4]))
+                  state))
 
-            ;; When a piece is selected, and clicking on a non-target empty cell, unselect the piece.
-            (is= (-> (s/create-initial-state)
-                     (s/set-selected-piece-coordinates (s/create-coordinates 6 0))
-                     (handle-cell-click (s/create-coordinates 3 0)))
-                 (s/create-initial-state))
+           ;; When a piece is selected, and clicking on a non-target empty cell, unselect the piece.
+           (is= (-> (s/create-initial-state)
+                    (s/set-selected-piece-coordinates [0 1])
+                    (handle-cell-click [0 4]))
+                (s/create-initial-state))
 
-            ;; When clicking an already selected piece, unselect it.
-            (is= (-> (s/create-initial-state)
-                     (s/set-selected-piece-coordinates (s/create-coordinates 6 0))
-                     (handle-cell-click (s/create-coordinates 6 0)))
-                 (s/create-initial-state))
+           ;; When clicking an already selected piece, unselect it.
+           (is= (-> (s/create-initial-state)
+                    (s/set-selected-piece-coordinates [0 1])
+                    (handle-cell-click [0 1]))
+                (s/create-initial-state))
 
-            ;; When having a piece selected, and clicking on a valid target cell.
-            (let [state (-> (s/create-initial-state)
-                            (s/set-selected-piece-coordinates (s/create-coordinates 6 0))
-                            (handle-cell-click (s/create-coordinates 5 0)))]
-              (is= (s/get-selected-target-coordinates state)
-                   (s/create-coordinates 5 0)))
-            )}
-  handle-cell-click [state coordinates]
+           ;; When having a piece selected, and clicking on a valid target cell.
+           (let [state (-> (s/create-initial-state)
+                           (s/set-selected-piece-coordinates [0 1])
+                           (handle-cell-click [0 2]))]
+             (is= (s/get-selected-target-coordinates state)
+                  [0 2])))}
+  [state coordinates]
   (let [piece (s/get-piece state coordinates)
         coordinates-selected (s/get-selected-piece-coordinates state)]
     (cond
@@ -217,14 +195,14 @@
 (defn should-call-move-piece?
   {:test (fn []
            (is (should-call-move-piece? (-> (s/create-initial-state)
-                                            (s/set-selected-piece-coordinates {:row 6 :column 0})
-                                            (s/set-selected-target-coordinates {:row 5 :column 0}))))
+                                            (s/set-selected-piece-coordinates [0 1])
+                                            (s/set-selected-target-coordinates [0 2]))))
            (is-not (should-call-move-piece? (-> (s/create-initial-state)
-                                                (s/set-selected-piece-coordinates {:row 6 :column 0})
-                                                (s/set-selected-target-coordinates {:row 5 :column 0})
+                                                (s/set-selected-piece-coordinates [0 1])
+                                                (s/set-selected-target-coordinates [0 2])
                                                 (set-waiting-for-service))))
            (is-not (should-call-move-piece? (-> (s/create-initial-state)
-                                                (s/set-selected-piece-coordinates {:row 6 :column 0}))))
+                                                (s/set-selected-piece-coordinates [0 1]))))
            (is-not (should-call-move-piece? (s/create-initial-state))))}
   [state]
   (and (s/get-selected-piece-coordinates state)
@@ -264,8 +242,8 @@
 (defn receive-move-piece-service-response
   {:test (fn []
            (let [state (receive-move-piece-service-response (-> (s/create-state)
-                                                                (s/set-selected-piece-coordinates {:row 6 :column 0})
-                                                                (s/set-selected-target-coordinates {:row 5 :column 0}))
+                                                                (s/set-selected-piece-coordinates [0 1])
+                                                                (s/set-selected-target-coordinates [0 2]))
                                                             {:status 200 :data "game-state"})]
              (is= (s/get-game-state state) "game-state")
              (is= (s/get-selected-piece-coordinates state) nil)
@@ -284,21 +262,20 @@
   {:test (fn []
            (is= (->> (get-cells-with-pieces (s/create-initial-state))
                      (first))
-                {:row    0
-                 :column 0
-                 :piece  {:type        "rook"
-                          :owner       "small"
-                          :valid-moves []}}))}
+                {:coordinates [0 7]
+                 :piece       {:type        "rook"
+                               :owner       "small"
+                               :valid-moves []}}))}
   [state]
   (->> (s/get-board state)
        (filter :piece)))
 
 (defn previous-move->piece
   {:test (fn []
-           (is= (previous-move->piece {:piece-type             "rook"
+           (is= (previous-move->piece {:piece-type       "rook"
                                        :owner            "large"
-                                       :from-coordinates [6 0]
-                                       :to-coordinates   [6 3]})
+                                       :from-coordinates [0 1]
+                                       :to-coordinates   [3 1]})
                 {:type  "rook"
                  :owner "large"}))}
   [previous-move]

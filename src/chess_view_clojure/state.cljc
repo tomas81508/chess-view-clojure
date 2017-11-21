@@ -8,252 +8,220 @@
   ([{game-state    :game-state
      outside-world :outside-world}]
    {:game-state    game-state
-    :view-state    {:selected-piece-coordinates nil}
+    :view-state    {:selected-piece-coordinates nil
+                    :movable-pieces-hint-opacity 0.2}
     :outside-world (or outside-world {:service nil})}))
 
 (defn create-initial-state []
-  (create-state {:view-state {:selected-piece-coordinates nil}
+  (create-state {:view-state {:selected-piece-coordinates nil
+                              :movable-pieces-hint-opacity 0.2}
                  :game-state {:playerInTurn "large",
-                              :board        [{:row    0,
-                                              :column 0,
-                                              :piece  {:type "rook", :owner "small", :valid-moves []}}
-                                             {:row    0,
-                                              :column 1,
-                                              :piece  {:type "knight", :owner "small", :valid-moves []}}
-                                             {:row    0,
-                                              :column 2,
-                                              :piece  {:type "bishop", :owner "small", :valid-moves []}}
-                                             {:row    0,
-                                              :column 3,
-                                              :piece  {:type "queen", :owner "small", :valid-moves []}}
-                                             {:row    0,
-                                              :column 4,
-                                              :piece  {:type "king", :owner "small", :valid-moves []}}
-                                             {:row    0,
-                                              :column 5,
-                                              :piece  {:type "bishop", :owner "small", :valid-moves []}}
-                                             {:row    0,
-                                              :column 6,
-                                              :piece  {:type "knight", :owner "small", :valid-moves []}}
-                                             {:row    0,
-                                              :column 7,
-                                              :piece  {:type "rook", :owner "small", :valid-moves []}}
-                                             {:row    1,
-                                              :column 0,
-                                              :piece  {:type "pawn", :owner "small", :valid-moves []}}
-                                             {:row    1,
-                                              :column 1,
-                                              :piece  {:type "pawn", :owner "small", :valid-moves []}}
-                                             {:row    1,
-                                              :column 2,
-                                              :piece  {:type "pawn", :owner "small", :valid-moves []}}
-                                             {:row    1,
-                                              :column 3,
-                                              :piece  {:type "pawn", :owner "small", :valid-moves []}}
-                                             {:row    1,
-                                              :column 4,
-                                              :piece  {:type "pawn", :owner "small", :valid-moves []}}
-                                             {:row    1,
-                                              :column 5,
-                                              :piece  {:type "pawn", :owner "small", :valid-moves []}}
-                                             {:row    1,
-                                              :column 6,
-                                              :piece  {:type "pawn", :owner "small", :valid-moves []}}
-                                             {:row    1,
-                                              :column 7,
-                                              :piece  {:type "pawn", :owner "small", :valid-moves []}}
-                                             {:row 2, :column 0, :piece nil}
-                                             {:row 2, :column 1, :piece nil}
-                                             {:row 2, :column 2, :piece nil}
-                                             {:row 2, :column 3, :piece nil}
-                                             {:row 2, :column 4, :piece nil}
-                                             {:row 2, :column 5, :piece nil}
-                                             {:row 2, :column 6, :piece nil}
-                                             {:row 2, :column 7, :piece nil}
-                                             {:row 3, :column 0, :piece nil}
-                                             {:row 3, :column 1, :piece nil}
-                                             {:row 3, :column 2, :piece nil}
-                                             {:row 3, :column 3, :piece nil}
-                                             {:row 3, :column 4, :piece nil}
-                                             {:row 3, :column 5, :piece nil}
-                                             {:row 3, :column 6, :piece nil}
-                                             {:row 3, :column 7, :piece nil}
-                                             {:row 4, :column 0, :piece nil}
-                                             {:row 4, :column 1, :piece nil}
-                                             {:row 4, :column 2, :piece nil}
-                                             {:row 4, :column 3, :piece nil}
-                                             {:row 4, :column 4, :piece nil}
-                                             {:row 4, :column 5, :piece nil}
-                                             {:row 4, :column 6, :piece nil}
-                                             {:row 4, :column 7, :piece nil}
-                                             {:row 5, :column 0, :piece nil}
-                                             {:row 5, :column 1, :piece nil}
-                                             {:row 5, :column 2, :piece nil}
-                                             {:row 5, :column 3, :piece nil}
-                                             {:row 5, :column 4, :piece nil}
-                                             {:row 5, :column 5, :piece nil}
-                                             {:row 5, :column 6, :piece nil}
-                                             {:row 5, :column 7, :piece nil}
-                                             {:row    6,
-                                              :column 0,
-                                              :piece  {:type "pawn", :owner "large", :valid-moves [[5 0] [4 0]]}}
-                                             {:row    6,
-                                              :column 1,
-                                              :piece  {:type "pawn", :owner "large", :valid-moves [[4 1] [5 1]]}}
-                                             {:row    6,
-                                              :column 2,
-                                              :piece  {:type "pawn", :owner "large", :valid-moves [[4 2] [5 2]]}}
-                                             {:row    6,
-                                              :column 3,
-                                              :piece  {:type "pawn", :owner "large", :valid-moves [[4 3] [5 3]]}}
-                                             {:row    6,
-                                              :column 4,
-                                              :piece  {:type "pawn", :owner "large", :valid-moves [[5 4] [4 4]]}}
-                                             {:row    6,
-                                              :column 5,
-                                              :piece  {:type "pawn", :owner "large", :valid-moves [[5 5] [4 5]]}}
-                                             {:row    6,
-                                              :column 6,
-                                              :piece  {:type "pawn", :owner "large", :valid-moves [[4 6] [5 6]]}}
-                                             {:row    6,
-                                              :column 7,
-                                              :piece  {:type "pawn", :owner "large", :valid-moves [[4 7] [5 7]]}}
-                                             {:row    7,
-                                              :column 0,
-                                              :piece  {:type "rook", :owner "large", :valid-moves []}}
-                                             {:row    7,
-                                              :column 1,
-                                              :piece  {:type "knight", :owner "large", :valid-moves [[5 2] [5 0]]}}
-                                             {:row    7,
-                                              :column 2,
-                                              :piece  {:type "bishop", :owner "large", :valid-moves []}}
-                                             {:row    7,
-                                              :column 3,
-                                              :piece  {:type "queen", :owner "large", :valid-moves []}}
-                                             {:row    7,
-                                              :column 4,
-                                              :piece  {:type "king", :owner "large", :valid-moves []}}
-                                             {:row    7,
-                                              :column 5,
-                                              :piece  {:type "bishop", :owner "large", :valid-moves []}}
-                                             {:row    7,
-                                              :column 6,
-                                              :piece  {:type "knight", :owner "large", :valid-moves [[5 7] [5 5]]}}
-                                             {:row    7,
-                                              :column 7,
-                                              :piece  {:type "rook", :owner "large", :valid-moves []}}],
+                              :board        [{:coordinates [0 7],
+                                              :piece       {:type "rook", :owner "small", :valid-moves []}}
+                                             {:coordinates [1 7],
+                                              :piece       {:type "knight", :owner "small", :valid-moves []}}
+                                             {:coordinates [2 7],
+                                              :piece       {:type "bishop", :owner "small", :valid-moves []}}
+                                             {:coordinates [3 7],
+                                              :piece       {:type "queen", :owner "small", :valid-moves []}}
+                                             {:coordinates [4 7],
+                                              :piece       {:type "king", :owner "small", :valid-moves []}}
+                                             {:coordinates [5 7],
+                                              :piece       {:type "bishop", :owner "small", :valid-moves []}}
+                                             {:coordinates [6 7],
+                                              :piece       {:type "knight", :owner "small", :valid-moves []}}
+                                             {:coordinates [7 7],
+                                              :piece       {:type "rook", :owner "small", :valid-moves []}}
+                                             {:coordinates [0 6],
+                                              :piece       {:type "pawn", :owner "small", :valid-moves []}}
+                                             {:coordinates [1 6],
+                                              :piece       {:type "pawn", :owner "small", :valid-moves []}}
+                                             {:coordinates [2 6],
+                                              :piece       {:type "pawn", :owner "small", :valid-moves []}}
+                                             {:coordinates [3 6],
+                                              :piece       {:type "pawn", :owner "small", :valid-moves []}}
+                                             {:coordinates [4 6],
+                                              :piece       {:type "pawn", :owner "small", :valid-moves []}}
+                                             {:coordinates [5 6],
+                                              :piece       {:type "pawn", :owner "small", :valid-moves []}}
+                                             {:coordinates [6 6],
+                                              :piece       {:type "pawn", :owner "small", :valid-moves []}}
+                                             {:coordinates [7 6],
+                                              :piece       {:type "pawn", :owner "small", :valid-moves []}}
+                                             {:coordinates [0 5], :piece nil}
+                                             {:coordinates [1 5], :piece nil}
+                                             {:coordinates [2 5], :piece nil}
+                                             {:coordinates [3 5], :piece nil}
+                                             {:coordinates [4 5], :piece nil}
+                                             {:coordinates [5 5], :piece nil}
+                                             {:coordinates [6 5], :piece nil}
+                                             {:coordinates [7 5], :piece nil}
+                                             {:coordinates [0 4], :piece nil}
+                                             {:coordinates [1 4], :piece nil}
+                                             {:coordinates [2 4], :piece nil}
+                                             {:coordinates [3 4], :piece nil}
+                                             {:coordinates [4 4], :piece nil}
+                                             {:coordinates [5 4], :piece nil}
+                                             {:coordinates [6 4], :piece nil}
+                                             {:coordinates [7 4], :piece nil}
+                                             {:coordinates [0 3], :piece nil}
+                                             {:coordinates [1 3], :piece nil}
+                                             {:coordinates [2 3], :piece nil}
+                                             {:coordinates [3 3], :piece nil}
+                                             {:coordinates [4 3], :piece nil}
+                                             {:coordinates [5 3], :piece nil}
+                                             {:coordinates [6 3], :piece nil}
+                                             {:coordinates [7 3], :piece nil}
+                                             {:coordinates [0 2], :piece nil}
+                                             {:coordinates [1 2], :piece nil}
+                                             {:coordinates [2 2], :piece nil}
+                                             {:coordinates [3 2], :piece nil}
+                                             {:coordinates [4 2], :piece nil}
+                                             {:coordinates [5 2], :piece nil}
+                                             {:coordinates [6 2], :piece nil}
+                                             {:coordinates [7 2], :piece nil}
+                                             {:coordinates [0 1],
+                                              :piece       {:type "pawn", :owner "large", :valid-moves [[0 2] [0 3]]}}
+                                             {:coordinates [1 1],
+                                              :piece       {:type "pawn", :owner "large", :valid-moves [[1 3] [1 2]]}}
+                                             {:coordinates [2 1],
+                                              :piece       {:type "pawn", :owner "large", :valid-moves [[2 3] [2 2]]}}
+                                             {:coordinates [3 1],
+                                              :piece       {:type "pawn", :owner "large", :valid-moves [[3 3] [3 2]]}}
+                                             {:coordinates [4 1],
+                                              :piece       {:type "pawn", :owner "large", :valid-moves [[4 2] [4 3]]}}
+                                             {:coordinates [5 1],
+                                              :piece       {:type "pawn", :owner "large", :valid-moves [[5 2] [5 3]]}}
+                                             {:coordinates [6 1],
+                                              :piece       {:type "pawn", :owner "large", :valid-moves [[6 2] [6 3]]}}
+                                             {:coordinates [7 1],
+                                              :piece       {:type "pawn", :owner "large", :valid-moves [[7 2] [7 3]]}}
+                                             {:coordinates [0 0],
+                                              :piece       {:type "rook", :owner "large", :valid-moves []}}
+                                             {:coordinates [1 0],
+                                              :piece       {:type "knight", :owner "large", :valid-moves [[2 2] [0 2]]}}
+                                             {:coordinates [2 0],
+                                              :piece       {:type "bishop", :owner "large", :valid-moves []}}
+                                             {:coordinates [3 0],
+                                              :piece       {:type "queen", :owner "large", :valid-moves []}}
+                                             {:coordinates [4 0],
+                                              :piece       {:type "king", :owner "large", :valid-moves []}}
+                                             {:coordinates [5 0],
+                                              :piece       {:type "bishop", :owner "large", :valid-moves []}}
+                                             {:coordinates [6 0],
+                                              :piece       {:type "knight", :owner "large", :valid-moves [[7 2] [5 2]]}}
+                                             {:coordinates [7 0],
+                                              :piece       {:type "rook", :owner "large", :valid-moves []}}],
                               :players      [{:id "large"} {:id "small"}]}}))
 
 (defn create-coordinates
   {:test (fn []
-           (is= (create-coordinates 3 5)
-                {:row 3 :column 5})
            (is= (create-coordinates "a8")
-                {:row 0 :column 0})
+                [0 7])
            (is= (create-coordinates "c2")
-                {:row 6 :column 2})
+                [2 1])
            (is= (create-coordinates "h1")
-                {:row 7 :column 7}))}
+                [7 0]))}
   ([chess-coordinates]
    (let []
-     (create-coordinates (- 8 (read-string (str (second chess-coordinates))))
-                         (- (int (first chess-coordinates)) 97))))
-  ([row column]
-   {:row row :column column}))
+     [(- (int (first chess-coordinates)) 97)
+      (- (read-string (str (second chess-coordinates))) 1)])))
 
 (defn get-board [state]
   (get-in state [:game-state :board]))
 
-(defn
-  ^{:test (fn []
-            (is= (take 2 (first (get-board-rows (create-initial-state))))
-                 [{:row 0, :column 0, :piece {:type "rook", :owner "small", :valid-moves []}}
-                  {:row 0, :column 1, :piece {:type "knight", :owner "small", :valid-moves []}}]))}
-  get-board-rows [state]
+(defn get-board-rows
+  {:test (fn []
+           (is= (take 2 (first (get-board-rows (create-initial-state))))
+                [{:coordinates [0 7], :piece {:type "rook", :owner "small", :valid-moves []}}
+                 {:coordinates [1 7], :piece {:type "knight", :owner "small", :valid-moves []}}]))}
+  [state]
   (->> (get-board state)
        (partition 8)))
 
-(defn
-  ^{:test (fn []
-            (is= (get-cell (create-initial-state) (create-coordinates 0 0))
-                 {:row 0, :column 0, :piece {:type "rook", :owner "small", :valid-moves []}})
-            (is= (get-cell (create-initial-state) (create-coordinates 1 3))
-                 {:row 1, :column 3, :piece {:type "pawn", :owner "small", :valid-moves []}}))}
-  get-cell [state {row :row column :column}]
-  (get-in state [:game-state :board (+ (* row 8) column)]))
+(defn get-cell
+  {:test (fn []
+           (is= (get-cell (create-initial-state) [0 7])
+                {:coordinates [0 7], :piece {:type "rook", :owner "small", :valid-moves []}})
+           (is= (get-cell (create-initial-state) [3 6])
+                {:coordinates [3 6], :piece {:type "pawn", :owner "small", :valid-moves []}}))}
+  [state coordinates]
+  (->> (get-board state)
+       (filter (fn [cell]
+                 (= (:coordinates cell) coordinates)))
+       (first)))
 
-(defn
-  ^{:test (fn []
-            (is= (get-piece {:piece {:type "rook", :owner "small"}})
-                 {:type "rook", :owner "small"})
-            (is= (get-piece {:piece nil})
-                 nil)
-            (is= (get-piece (create-initial-state) (create-coordinates 0 0))
-                 {:type "rook", :owner "small" :valid-moves []}))}
-  get-piece
+(defn get-piece
+  {:test (fn []
+           (is= (get-piece {:piece {:type "rook", :owner "small"}})
+                {:type "rook", :owner "small"})
+           (is= (get-piece {:piece nil})
+                nil)
+           (is= (get-piece (create-initial-state) [0 7])
+                {:type "rook", :owner "small" :valid-moves []}))}
   ([state coordinates]
    {:pre [(not (nil? coordinates))]}
    (get-piece (get-cell state coordinates)))
   ([cell]
    (:piece cell)))
 
-(defn
-  ^{:test (fn []
-            (is= (get-player-in-turn (create-initial-state))
-                 "large"))}
-  get-player-in-turn [state]
+(defn get-player-in-turn
+  {:test (fn []
+           (is= (get-player-in-turn (create-initial-state))
+                "large"))}
+  [state]
   (get-in state [:game-state :playerInTurn]))
 
-(defn
-  ^{:test (fn []
-            (is= (get-players (create-initial-state))
-                 [{:id "large"} {:id "small"}]))}
-  get-players [state]
+(defn get-players
+  {:test (fn []
+           (is= (get-players (create-initial-state))
+                [{:id "large"} {:id "small"}]))}
+  [state]
   (get-in state [:game-state :players]))
 
-(defn
-  ^{:test (fn []
-            (is= (-> (create-initial-state)
-                     (get-piece (create-coordinates 0 0))
-                     (get-valid-moves))
-                 #{})
-            (is= (-> (create-initial-state)
-                     (get-piece (create-coordinates 6 0))
-                     (get-valid-moves))
-                 #{[5 0] [4 0]}))}
-  get-valid-moves [piece]
+(defn get-valid-moves
+  {:test (fn []
+           (is= (-> (create-initial-state)
+                    (get-piece [0 7])
+                    (get-valid-moves))
+                #{})
+           (is= (-> (create-initial-state)
+                    (get-piece [0 1])
+                    (get-valid-moves))
+                #{[0 2] [0 3]}))}
+  [piece]
   (set (:valid-moves piece)))
 
-(defn
-  ^{:test (fn []
-            ;; This is tested by get-selected-piece-coordinates.
-            )}
-  set-selected-piece-coordinates [state coordinates]
+(defn set-selected-piece-coordinates
+  {:test (fn []
+           ;; This is tested by get-selected-piece-coordinates.
+           )}
+  [state coordinates]
   (assoc-in state [:view-state :selected-piece-coordinates] coordinates))
 
-(defn
-  ^{:test (fn []
-            (is= (-> (create-initial-state)
-                     (set-selected-piece-coordinates :value)
-                     (get-selected-piece-coordinates))
-                 :value))}
-  get-selected-piece-coordinates [state]
+(defn get-selected-piece-coordinates
+  {:test (fn []
+           (is= (-> (create-initial-state)
+                    (set-selected-piece-coordinates :value)
+                    (get-selected-piece-coordinates))
+                :value))}
+  [state]
   (get-in state [:view-state :selected-piece-coordinates]))
 
-(defn
-  ^{:test (fn []
-            ;; This is tested by get-selected-target-coordinates.
-            )}
-  set-selected-target-coordinates [state coordinates]
+(defn set-selected-target-coordinates
+  {:test (fn []
+           ;; This is tested by get-selected-target-coordinates.
+           )}
+  [state coordinates]
   (assoc-in state [:view-state :selected-target-coordinates] coordinates))
 
-(defn
-  ^{:test (fn []
-            (is= (-> (create-initial-state)
-                     (set-selected-target-coordinates :value)
-                     (get-selected-target-coordinates))
-                 :value))}
-  get-selected-target-coordinates [state]
+(defn get-selected-target-coordinates
+  {:test (fn []
+           (is= (-> (create-initial-state)
+                    (set-selected-target-coordinates :value)
+                    (get-selected-target-coordinates))
+                :value))}
+  [state]
   (get-in state [:view-state :selected-target-coordinates]))
 
 
@@ -302,6 +270,10 @@
   [state]
   (last (get-previous-moves state)))
 
-(defn bad-coordinates->good-coordinates
-  [bad-coordinates]
-  (create-coordinates (first bad-coordinates) (last bad-coordinates)))
+(defn get-movable-pieces-hint-opacity
+  [state]
+  (get-in state [:view-state :movable-pieces-hint-opacity]))
+
+(defn set-movable-pieces-hint-opacity
+  [state value]
+  (assoc-in state [:view-state :movable-pieces-hint-opacity] value))

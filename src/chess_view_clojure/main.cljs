@@ -1,6 +1,6 @@
 (ns chess-view-clojure.main
   (:require [reagent.core :as reagent :refer [atom]]
-            [chess-view-clojure.state :refer [create-state]]
+            [chess-view-clojure.state :refer [create-state] :as state]
             [chess-view-clojure.app-component :as app-component]
             [chess-view-clojure.core :as core]
             [chess-view-clojure.service :as service]))
@@ -37,6 +37,9 @@
              :cell-click
              (swap! app-state-atom core/handle-cell-click data)
 
+             :movable-pieces-hint-opacity-change
+             (swap! app-state-atom state/set-movable-pieces-hint-opacity (:value data))
+
              :redo
              (swap! app-state-atom core/handle-redo-click)
 
@@ -45,6 +48,5 @@
 
 (reagent/render-component [app-component/app-component {:app-state-atom app-state-atom
                                                         :trigger-event  (fn [{event :event data :data :as params}]
-                                                                            (println event data)
                                                                             (handle-event! params))}]
                           (. js/document (getElementById "app")))
