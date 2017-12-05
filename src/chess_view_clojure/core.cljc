@@ -33,7 +33,7 @@
                 "asset/piece/pawn-white.svg"))}
   [state piece]
   (str "asset/piece/"
-       (:type piece)
+       (name (:type piece))
        "-"
        (player-id->color state (:owner piece))
        ".svg"))
@@ -143,6 +143,14 @@
 (defn handle-redo-click [state]
   (assoc-in state [:view-state :redo-selected] true))
 
+(defn set-connected
+  [state connected]
+  (assoc state :connected connected))
+
+(defn connected?
+  [state]
+  (:connected state))
+
 (defn set-waiting-for-create-game-service
   ;; This one is tested in the waiting-for-create-game-service? function tests.
   [state]
@@ -168,13 +176,17 @@
       (s/set-waiting-for-service false)
       (s/set-game-state (:data response))))
 
-(defn should-call-create-game?
+(defn should-create-game?
   {:test (fn []
-           (is (should-call-create-game? (s/create-state)))
-           (is-not (should-call-create-game? (set-waiting-for-create-game-service (s/create-state))))
-           (is-not (should-call-create-game? (s/create-initial-state))))}
+           (is (should-create-game? (-> (s/create-state)
+                                        (set-connected true))))
+           (is-not (should-create-game? (set-waiting-for-create-game-service (s/create-state))))
+           (is-not (should-create-game? (s/create-initial-state)))
+           (is-not (should-create-game? (-> (s/create-state)
+                                            (set-connected false)))))}
   [state]
-  (and (not (s/get-game-state state))
+  (and (connected? state)
+       (not (s/get-game-state state))
        (not (waiting-for-create-game-service? state))))
 
 (defn set-waiting-for-service
@@ -192,31 +204,39 @@
   [state]
   (s/waiting-for-service? state))
 
-(defn should-call-move-piece?
+(defn should-move-piece?
   {:test (fn []
-           (is (should-call-move-piece? (-> (s/create-initial-state)
-                                            (s/set-selected-piece-coordinates [0 1])
-                                            (s/set-selected-target-coordinates [0 2]))))
-           (is-not (should-call-move-piece? (-> (s/create-initial-state)
-                                                (s/set-selected-piece-coordinates [0 1])
-                                                (s/set-selected-target-coordinates [0 2])
-                                                (set-waiting-for-service))))
-           (is-not (should-call-move-piece? (-> (s/create-initial-state)
-                                                (s/set-selected-piece-coordinates [0 1]))))
-           (is-not (should-call-move-piece? (s/create-initial-state))))}
+           (is (should-move-piece? (-> (s/create-initial-state)
+                                       (set-connected true)
+                                       (s/set-selected-piece-coordinates [0 1])
+                                       (s/set-selected-target-coordinates [0 2]))))
+           (is-not (should-move-piece? (-> (s/create-initial-state)
+                                           (set-connected false)
+                                           (s/set-selected-piece-coordinates [0 1])
+                                           (s/set-selected-target-coordinates [0 2]))))
+           (is-not (should-move-piece? (-> (s/create-initial-state)
+                                           (s/set-selected-piece-coordinates [0 1])
+                                           (s/set-selected-target-coordinates [0 2])
+                                           (set-waiting-for-service))))
+           (is-not (should-move-piece? (-> (s/create-initial-state)
+                                           (s/set-selected-piece-coordinates [0 1]))))
+           (is-not (should-move-piece? (s/create-initial-state))))}
   [state]
-  (and (s/get-selected-piece-coordinates state)
+  (and (connected? state)
+       (s/get-selected-piece-coordinates state)
        (s/get-selected-target-coordinates state)
        (not (waiting-for-service? state))))
 
-(defn should-call-undo?
+(defn should-undo?
   [state]
-  (and (get-in state [:view-state :undo-selected])
+  (and (connected? state)
+       (get-in state [:view-state :undo-selected])
        (not (waiting-for-service? state))))
 
-(defn should-call-redo?
+(defn should-redo?
   [state]
-  (and (get-in state [:view-state :redo-selected])
+  (and (connected? state)
+       (get-in state [:view-state :redo-selected])
        (not (waiting-for-service? state))))
 
 
