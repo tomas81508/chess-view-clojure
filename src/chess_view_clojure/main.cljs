@@ -12,13 +12,13 @@
 
 (defonce app-state-atom (atom nil))
 
-(defn handle-receive-data! [data]
-  (println data)
-  (swap! app-state-atom core/receive-move-piece-service-response data))
+(defn handle-receive-msg! [msg]
+  (println (:player-id msg))
+  (swap! app-state-atom core/receive-move-piece-service-response msg))
 
 (when-not (websocket/connected?)
   (websocket/connect! (str "ws://" (aget js/window "location" "hostname") ":9876/")
-                      handle-receive-data!
+                      handle-receive-msg!
                       (fn handle-connected []
                         (swap! app-state-atom assoc :connected true))))
 
